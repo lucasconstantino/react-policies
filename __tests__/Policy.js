@@ -20,17 +20,6 @@ describe('Policy', () => {
     expect(Wrapper.find(Dumb).length).toBe(1)
   })
 
-  it('should be possible to use single function argument short syntax', async () => {
-    const Dumb = props => (<div />)
-    const policy = Policy(props => props.valid)
-    const PoliciedComponent = policy(Dumb)
-    const Wrapper = mount(<PoliciedComponent valid />)
-
-    expect(Wrapper.find(Dumb).length).toBe(0)
-    await sleep(1)
-    expect(Wrapper.find(Dumb).length).toBe(1)
-  })
-
   it('should not show component if policy validates false', async () => {
     const Dumb = props => (<div />)
     const policy = Policy({ test: props => props.valid })
@@ -106,6 +95,29 @@ describe('Policy', () => {
     expect(Wrapper.find(Dumb).length).toBe(0)
 
     Wrapper.setProps({ valid: true })
+    await sleep(1)
+    expect(Wrapper.find(Dumb).length).toBe(1)
+  })
+
+  it('should be possible to use single function argument short syntax', async () => {
+    const Dumb = props => (<div />)
+    const policy = Policy(props => props.valid)
+    const PoliciedComponent = policy(Dumb)
+    const Wrapper = mount(<PoliciedComponent valid />)
+
+    expect(Wrapper.find(Dumb).length).toBe(0)
+    await sleep(1)
+    expect(Wrapper.find(Dumb).length).toBe(1)
+  })
+
+  it('should be possible to create policy derivatives', async () => {
+    const Dumb = props => (<div />)
+    const policy = Policy(props => props.valid)
+    const derivative = policy.derivate(props => props.invalid)
+    const PoliciedComponent = derivative(Dumb)
+    const Wrapper = mount(<PoliciedComponent invalid />)
+
+    expect(Wrapper.find(Dumb).length).toBe(0)
     await sleep(1)
     expect(Wrapper.find(Dumb).length).toBe(1)
   })

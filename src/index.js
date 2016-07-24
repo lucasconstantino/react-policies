@@ -17,21 +17,25 @@ const ignore = () => {}
  *                                    is not finished.
  * @return {Function} A policy decorator.
  */
-const Policy = config => {
+const Policy = (...configs) => {
+  const config = configs
+    .map(config => typeof config === 'function' ? { test: config } : config)
+    .reduce((prev, next) => ({ ...prev, ...next }), {})
+
   const {
     test,
     failure = () => {},
     preview = false,
     empty = <div />,
     placeholder = null,
-  } = typeof config === 'function' ? { test: config } : config
+  } = config
 
   const tester = props => (async () => test(props))().then(result => {
     if (!result || result instanceof Error) throw result
     return result
   })
 
-  return Composed => {
+  const HOC = Composed => {
     const displayName = Composed.displayName || 'Composed'
 
     return class PoliciedComponent extends Component {
@@ -83,6 +87,10 @@ const Policy = config => {
       }
     }
   }
+
+  HOC.derivate = override => Policy(config, override)
+
+  return HOC
 }
 
 export default Policy
