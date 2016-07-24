@@ -14,7 +14,7 @@
     "lint": "node_modules/.bin/eslint src",
     "prepublish": "rm -rf lib && npm run build",
     "test": "jest --verbose --no-cache",
-    "test:watch": "jest --watch=all --verbose --no-cache"
+    "test:watch": "jest --watch=all --verbose --no-cache --onlyChanged"
   },
   "authors": [
     "Lucas Constantino Silva"

@@ -86,3 +86,6 @@ const Policy = config => {
 }
 
 export default Policy
+
+export const combine = (...policies) => component => [].concat(policies)
+  .reduce((component, policy) => policy(component), component)
