@@ -121,4 +121,20 @@ describe('Policy', () => {
     await sleep(1)
     expect(Wrapper.find(Dumb).length).toBe(1)
   })
+
+  it('should not show component after properties change but prevented change', async () => {
+    const Dumb = props => (<div />)
+    const policy = Policy({ test: props => props.valid, shouldTest: () => false })
+    const PoliciedComponent = policy(Dumb)
+    const Wrapper = mount(<PoliciedComponent />)
+
+    expect(Wrapper.find(Dumb).length).toBe(0)
+
+    await sleep(1)
+    expect(Wrapper.find(Dumb).length).toBe(0)
+
+    Wrapper.setProps({ valid: true })
+    await sleep(1)
+    expect(Wrapper.find(Dumb).length).toBe(0)
+  })
 })

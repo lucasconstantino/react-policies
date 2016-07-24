@@ -28,9 +28,15 @@ const Policy = (...configs) => {
     preview = false,
     empty = <div />,
     placeholder = null,
+    shouldTest = () => true,
   } = config
 
-  const tester = props => (async () => test(props))().then(result => {
+  const _test = props => (async () => test(props))().then(result => {
+    if (!result || result instanceof Error) throw result
+    return result
+  })
+
+  const _shouldTest = (to, from) => (async () => shouldTest(to, from))().then(result => {
     if (!result || result instanceof Error) throw result
     return result
   })
@@ -47,12 +53,10 @@ const Policy = (...configs) => {
       }
 
       async test (props) {
-        this.setState({ tested: false, testing: true, failed: false })
-
         try {
-          let result = await tester(props)
+          this.setState({ tested: false, testing: true, failed: false })
+          await _test(props)
           this.setState({ tested: true, testing: false, failed: false })
-          return result
         } catch (e) {
           this.setState({ tested: true, testing: false, failed: true })
           failure(e)
@@ -65,7 +69,7 @@ const Policy = (...configs) => {
       }
 
       componentWillReceiveProps (nextProps) {
-        this.test(nextProps).catch(ignore)
+        _shouldTest(nextProps, this.props).then(() => this.test(nextProps)).catch(ignore)
       }
 
       render () {
