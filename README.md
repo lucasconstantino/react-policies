@@ -69,7 +69,7 @@ Config key              | Type     | Description
 `preview`               | Boolean  | If set to 'true' will render the component while the testing process is not finished. Defaults to 'false', which means 'placeholder' or 'empty' component will be used instead.
 `empty`                 | Object   | A component to be rendered when the test fails.
 `placeholder`           | Object   | A component to be redered while the testing process is not finished.
-`shouldTest`            | Function | A callback to determine if policy testing should be re-executed or note. This callback receives two arguments: 'to' and 'from', where 'to' equals nextProps and 'from' equals current.
+`shouldTest`            | Function | A callback to determine if policy testing should be re-executed after properties change. This callback receives two arguments: 'to' and 'from', where 'to' equals nextProps and 'from' equals current.
 
 > `config` can also be a function, which will be taken for the `test` configuration key.
 
