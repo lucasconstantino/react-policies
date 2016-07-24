@@ -1,4 +1,4 @@
-# React Policies
+# React Policies [![Build Status](https://travis-ci.org/lucasconstantino/react-policies.svg?branch=master)](https://travis-ci.org/lucasconstantino/react-policies)
 
 > Decoupled policy system for React components
 
