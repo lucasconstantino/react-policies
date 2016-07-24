@@ -59,6 +59,10 @@ const Policy = (...configs) => {
         policy: PropTypes.object
       }
 
+      static contextTypes = {
+        policy: PropTypes.object,
+      }
+
       constructor (props, foo, bar) {
         super(props)
         this.state = { tested: false, testing: null, failed: null }
@@ -87,6 +91,7 @@ const Policy = (...configs) => {
       getChildContext () {
         return {
           policy: {
+            ...this.context.policy || {},
             [_name]: this.state
           }
         }

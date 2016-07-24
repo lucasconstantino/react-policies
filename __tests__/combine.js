@@ -32,4 +32,38 @@ describe('Combine', () => {
     await sleep(1)
     expect(Wrapper.find(Dumb).length).toBe(0)
   })
+
+  it('should have combined policy contexts available to components', async () => {
+    class Dumb extends React.Component {
+      static contextTypes = {
+        policy: React.PropTypes.object,
+      }
+
+      render () {
+        return (
+          <dl>
+            { Object.keys(this.context.policy || {}).map((name, key) => (
+              <div key={ key }>
+                <dt>{ name }</dt>
+                <dd>{ JSON.stringify(this.context.policy[name]) }</dd>
+              </div>
+            )) }
+          </dl>
+        )
+      }
+    }
+
+    const first = Policy({ test: () => true, name: 'first', preview: true })
+    const second = Policy({ test: () => true, name: 'second', preview: true })
+    const PoliciedComponent = policies(first, second)(Dumb)
+    const Wrapper = mount(<PoliciedComponent first />)
+
+    expect(Wrapper.text()).toContain('second{"tested":false,"testing":true')
+    expect(Wrapper.text()).toContain('first{"tested":false,"testing":true')
+
+    await sleep(1)
+
+    expect(Wrapper.text()).toContain('second{"tested":true,"testing":false')
+    expect(Wrapper.text()).toContain('first{"tested":true,"testing":false')
+  })
 })
