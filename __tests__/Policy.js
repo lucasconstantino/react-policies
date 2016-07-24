@@ -137,4 +137,33 @@ describe('Policy', () => {
     await sleep(1)
     expect(Wrapper.find(Dumb).length).toBe(0)
   })
+
+  it('should have policy context available to components', async () => {
+    class Dumb extends React.Component {
+      static contextTypes = {
+        policy: React.PropTypes.object,
+      }
+
+      render () {
+        return (
+          <dl>
+            { Object.keys(this.context.policy || {}).map((name, key) => (
+              <div key={ key }>
+                <dt>{ name }</dt>
+                <dd>{ JSON.stringify(this.context.policy[name]) }</dd>
+              </div>
+            )) }
+          </dl>
+        )
+      }
+    }
+
+    const policy = Policy({ test: () => true, name: 'name', preview: true })
+    const PoliciedComponent = policy(Dumb)
+    const Wrapper = mount(<PoliciedComponent />)
+
+    expect(Wrapper.text()).toContain('"tested":false,"testing":true,"failed":false')
+    await sleep(1)
+    expect(Wrapper.text()).toContain('"tested":true,"testing":false,"failed":false')
+  })
 })

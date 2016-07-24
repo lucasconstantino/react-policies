@@ -1,5 +1,6 @@
-import React, { Component } from 'react'
+import React, { Component, PropTypes } from 'react'
 
+let count = 0
 const ignore = () => {}
 
 /**
@@ -27,6 +28,7 @@ const Policy = (...configs) => {
     .reduce((prev, next) => ({ ...prev, ...next }), {})
 
   const {
+    name,
     test,
     failure = () => {},
     preview = false,
@@ -34,6 +36,8 @@ const Policy = (...configs) => {
     placeholder = null,
     shouldTest = () => true,
   } = config
+
+  const _name = name || (test.name !== 'test' && test.name) || 'policy' + count++
 
   const _test = props => (async () => test(props))().then(result => {
     if (!result || result instanceof Error) throw result
@@ -50,6 +54,10 @@ const Policy = (...configs) => {
 
     return class PoliciedComponent extends Component {
       static displayName = `PoliciedComponent(${displayName})`
+
+      static childContextTypes = {
+        policy: PropTypes.object
+      }
 
       constructor (props, foo, bar) {
         super(props)
@@ -74,6 +82,14 @@ const Policy = (...configs) => {
 
       componentWillReceiveProps (nextProps) {
         _shouldTest(nextProps, this.props).then(() => this.test(nextProps)).catch(ignore)
+      }
+
+      getChildContext () {
+        return {
+          policy: {
+            [_name]: this.state
+          }
+        }
       }
 
       render () {
