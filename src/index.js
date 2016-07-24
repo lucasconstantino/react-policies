@@ -24,7 +24,7 @@ const Policy = config => {
     preview = false,
     empty = <div />,
     placeholder = null,
-  } = config
+  } = typeof config === 'function' ? { test: config } : config
 
   const tester = props => (async () => test(props))().then(result => {
     if (!result || result instanceof Error) throw result

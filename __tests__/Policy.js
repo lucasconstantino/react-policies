@@ -20,6 +20,17 @@ describe('Policy', () => {
     expect(Wrapper.find(Dumb).length).toBe(1)
   })
 
+  it('should be possible to use single function argument short syntax', async () => {
+    const Dumb = props => (<div />)
+    const policy = Policy(props => props.valid)
+    const PoliciedComponent = policy(Dumb)
+    const Wrapper = mount(<PoliciedComponent valid />)
+
+    expect(Wrapper.find(Dumb).length).toBe(0)
+    await sleep(1)
+    expect(Wrapper.find(Dumb).length).toBe(1)
+  })
+
   it('should not show component if policy validates false', async () => {
     const Dumb = props => (<div />)
     const policy = Policy({ test: props => props.valid })
