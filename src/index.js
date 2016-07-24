@@ -15,6 +15,10 @@ const ignore = () => {}
  * @param {Object} [empty=<div />] A component to be rendered when the test fails.
  * @param {Object} [placeholder=null] A component to be redered while the testing process
  *                                    is not finished.
+ * @param {Function} [config.shouldTest] A callback to determine if policy testing
+ *                                       should be re-executed or note. This callback
+ *                                       receives two arguments: 'to' and 'from', where
+ *                                       'to' equals nextProps and 'from' equals current.
  * @return {Function} A policy decorator.
  */
 const Policy = (...configs) => {
