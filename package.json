@@ -11,10 +11,11 @@
   ],
   "scripts": {
     "build": "mkdir -p lib && babel ./src --out-dir ./lib",
-    "lint": "node_modules/.bin/eslint src",
+    "lint": "eslint src",
     "prepublish": "rm -rf lib && npm run build",
     "test": "jest --verbose --no-cache",
-    "test:watch": "jest --watch=all --verbose --no-cache --onlyChanged"
+    "test:watch": "jest --watch=all --verbose --no-cache --onlyChanged",
+    "ci": "npm run lint && npm run test"
   },
   "authors": [
     "Lucas Constantino Silva"
