@@ -49,71 +49,67 @@ const Policy = (...configs) => {
     return result
   })
 
-  const HOC = Composed => {
-    const displayName = Composed.displayName || 'Composed'
+  const HOC = Composed => class PoliciedComponent extends Component {
+    static displayName = `PoliciedComponent(${_name}/${Composed.displayName || 'Composed'})`
 
-    return class PoliciedComponent extends Component {
-      static displayName = `PoliciedComponent(${displayName})`
+    static childContextTypes = {
+      policy: PropTypes.object
+    }
 
-      static childContextTypes = {
-        policy: PropTypes.object
+    static contextTypes = {
+      policy: PropTypes.object,
+    }
+
+    constructor (props, foo, bar) {
+      super(props)
+      this.state = { tested: false, testing: null, failed: null }
+    }
+
+    async test (props) {
+      try {
+        this.setState({ tested: false, testing: true, failed: false })
+        await _test(props)
+        this.setState({ tested: true, testing: false, failed: false })
+      } catch (error) {
+        this.setState({ tested: true, testing: false, failed: true })
+        failure({ ...this, props, error })
+        throw error
       }
+    }
 
-      static contextTypes = {
-        policy: PropTypes.object,
-      }
+    componentDidMount () {
+      this.test(this.props).catch(ignore)
+    }
 
-      constructor (props, foo, bar) {
-        super(props)
-        this.state = { tested: false, testing: null, failed: null }
-      }
+    componentWillReceiveProps (nextProps) {
+      _shouldTest(nextProps, this.props).then(() => this.test(nextProps)).catch(ignore)
+    }
 
-      async test (props) {
-        try {
-          this.setState({ tested: false, testing: true, failed: false })
-          await _test(props)
-          this.setState({ tested: true, testing: false, failed: false })
-        } catch (e) {
-          this.setState({ tested: true, testing: false, failed: true })
-          failure(e)
-          throw e
+    getChildContext () {
+      return {
+        policy: {
+          ...this.context.policy || {},
+          [_name]: this.state
         }
       }
+    }
 
-      componentDidMount () {
-        this.test(this.props).catch(ignore)
-      }
+    render () {
+      const { tested, testing, failed } = this.state
 
-      componentWillReceiveProps (nextProps) {
-        _shouldTest(nextProps, this.props).then(() => this.test(nextProps)).catch(ignore)
-      }
+      // 1. In case still testing, not failed, and allowing preview.
+      if (testing && !failed && preview) return <Composed { ...this.props } />
 
-      getChildContext () {
-        return {
-          policy: {
-            ...this.context.policy || {},
-            [_name]: this.state
-          }
-        }
-      }
+      // 2. In case still testing and placeholder component available,
+      // show placeholder component.
+      if (!tested && !failed && placeholder) return placeholder
 
-      render () {
-        const { tested, testing, failed } = this.state
+      // 3. In case finished testing and not failed, render component.
+      if (tested && !failed) return <Composed { ...this.props } />
 
-        // 1. In case still testing, not failed, and allowing preview.
-        if (testing && !failed && preview) return <Composed { ...this.props } />
-
-        // 2. In case still testing and placeholder component available,
-        // show placeholder component.
-        if (!tested && !failed && placeholder) return placeholder
-
-        // 3. In case finished testing and not failed, render component.
-        if (tested && !failed) return <Composed { ...this.props } />
-
-        // 4. In case finished testing or failed or not previewing,
-        // return empty component or null if none given.
-        return empty || null
-      }
+      // 4. In case finished testing or failed or not previewing,
+      // return empty component or null if none given.
+      return empty || null
     }
   }
 
