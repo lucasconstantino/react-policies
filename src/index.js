@@ -120,5 +120,5 @@ const Policy = (...configs) => {
 
 export default Policy
 
-export const combine = (...policies) => component => [].concat(policies)
+export const combine = (...policies) => component => [].concat(policies).reverse()
   .reduce((component, policy) => policy(component), component)

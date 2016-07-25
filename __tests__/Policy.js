@@ -6,7 +6,7 @@ import { mount } from 'enzyme'
 
 import Policy from '../src'
 
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 describe('Policy', () => {
   it('should show component if policy validates true', async () => {

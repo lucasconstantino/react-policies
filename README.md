@@ -16,6 +16,7 @@ This module does not intend to do something much different, but instead it provi
 
 ```js
 import React, { Component, PropTypes } from 'react'
+import ReactDOM from 'react-dom'
 import Policy from 'react-policies'
 
 const authPolicy = Policy({
