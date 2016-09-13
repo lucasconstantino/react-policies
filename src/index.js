@@ -23,6 +23,10 @@ const ignore = () => {}
  *                                         similarly to "shouldComponentUpdate"; it
  *                                         receives "nextProps" as an argument and have
  *                                         current props accessible via "this.props".
+ * @param {Function} [config.compose] A callback to be called to allow composing the
+ *                                    PoliciedComponent. Useful for usage with other
+ *                                    HOC or libraries like redux (i.e. 'connect') and
+ *                                    react-router (i.e. 'withRouter').
  * @return {Function} A policy decorator.
  */
 const Policy = (...configs) => {
@@ -39,71 +43,76 @@ const Policy = (...configs) => {
     placeholder = null,
     shouldUpdate = () => true,
     isTesting = () => false,
+    compose = PoliciedComponent => PoliciedComponent,
   } = config
 
   const _name = name || (test.name !== 'test' && test.name) || 'policy' + count++
 
-  const HOC = Composed => class PoliciedComponent extends Component {
-    static displayName = `PoliciedComponent(${_name}/${Composed.displayName || 'Composed'})`
+  const HOC = Composed => {
+    class PoliciedComponent extends Component {
+      static displayName = `PoliciedComponent(${_name}/${Composed.displayName || 'Composed'})`
 
-    static childContextTypes = {
-      policy: PropTypes.object
-    }
-
-    static contextTypes = {
-      policy: PropTypes.object,
-    }
-
-    constructor (props, foo, bar) {
-      super(props)
-      this.state = { testing: true, failed: null }
-    }
-
-    test (props) {
-      const failed = !test.call(this, props)
-      const testing = isTesting.call(this, props)
-
-      this.setState({ testing, failed })
-
-      if (!testing && failed) failure.call(this, props)
-    }
-
-    componentDidMount () {
-      this.test(this.props)
-    }
-
-    componentWillReceiveProps (nextProps) {
-      if (shouldUpdate.call(this, nextProps)) {
-        this.test(nextProps)
+      static childContextTypes = {
+        policy: PropTypes.object
       }
-    }
 
-    getChildContext () {
-      return {
-        policy: {
-          ...this.context.policy || {},
-          [_name]: this.state
+      static contextTypes = {
+        policy: PropTypes.object,
+      }
+
+      constructor (props, foo, bar) {
+        super(props)
+        this.state = { testing: true, failed: null }
+      }
+
+      test (props) {
+        const failed = !test.call(this, props)
+        const testing = isTesting.call(this, props)
+
+        this.setState({ testing, failed })
+
+        if (!testing && failed) failure.call(this, props)
+      }
+
+      componentDidMount () {
+        this.test(this.props)
+      }
+
+      componentWillReceiveProps (nextProps) {
+        if (shouldUpdate.call(this, nextProps)) {
+          this.test(nextProps)
         }
       }
+
+      getChildContext () {
+        return {
+          policy: {
+            ...this.context.policy || {},
+            [_name]: this.state
+          }
+        }
+      }
+
+      render () {
+        const { testing, failed } = this.state
+
+        // 1. In case still testing, not failed, and allowing preview.
+        if (testing && preview) return <Composed { ...this.props } />
+
+        // 2. In case still testing and placeholder component available,
+        // show placeholder component.
+        if (testing && placeholder) return placeholder
+
+        // 3. In case finished testing and not failed, render component.
+        if (!testing && !failed) return <Composed { ...this.props } />
+
+        // 4. In case finished testing or failed or not previewing,
+        // return empty component or null if none given.
+        return empty || null
+      }
     }
 
-    render () {
-      const { testing, failed } = this.state
-
-      // 1. In case still testing, not failed, and allowing preview.
-      if (testing && preview) return <Composed { ...this.props } />
-
-      // 2. In case still testing and placeholder component available,
-      // show placeholder component.
-      if (testing && placeholder) return placeholder
-
-      // 3. In case finished testing and not failed, render component.
-      if (!failed) return <Composed { ...this.props } />
-
-      // 4. In case finished testing or failed or not previewing,
-      // return empty component or null if none given.
-      return empty || null
-    }
+    return compose(PoliciedComponent)
   }
 
   HOC.derivate = override => Policy(config, override)

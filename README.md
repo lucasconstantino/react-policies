@@ -72,7 +72,8 @@ Config key              | Type     | Description
 `preview`               | Boolean  | (optional) If set to 'true' will render the component while the testing process is not finished (see "isTesting" argument above). Defaults to 'false', which means 'placeholder' or 'empty' component will be used instead.
 `empty`                 | Object   | (optional) A component to be rendered when the test fails. Defaults to an empty `div`.
 `placeholder`           | Object   | (optional) A component to be rendered while the testing process is not finished (see "isTesting" argument above).
-`shouldUpdate`          | Function | (optional)A callback to determine if policy testing should be re-executed or note. It works much similarly to "shouldComponentUpdate"; it receives "nextProps" as an argument and have current props accessible via "this.props".
+`shouldUpdate`          | Function | (optional) A callback to determine if policy testing should be re-executed or note. It works much similarly to "shouldComponentUpdate"; it receives "nextProps" as an argument and have current props accessible via "this.props".
+`compose`               | Function | (optional) A callback to allow composing the PoliciedComponent. Useful for usage with other HOC or libraries like redux (i.e. 'connect') and react-router (i.e. 'withRouter'). It receives the PoliciedComponent as it's single argument.
 
 > `config` can also be a function, which will be taken for the `test` configuration key.
 

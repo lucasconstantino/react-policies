@@ -142,6 +142,22 @@ describe('Policy', () => {
     expect(Wrapper.find(Dumb).length).toBe(1)
   })
 
+  it('should be possible to wrap policy component using compose', () => {
+    const Container = props => <div>{ props.children }</div>
+    const wrap = PoliciedComponent => props => <Container><PoliciedComponent { ...props } /></Container>
+
+    const Dumb = props => (<div />)
+    const policy = Policy({
+      test: props => props.valid,
+      compose: PoliciedComponent => wrap(PoliciedComponent)
+    })
+    const PoliciedComponent = policy(Dumb)
+    const Wrapper = mount(<PoliciedComponent valid />)
+
+    expect(Wrapper.find(Dumb).length).toBe(1)
+    expect(Wrapper.find(Container).length).toBe(1)
+  })
+
   it('should be possible to create policy derivatives', () => {
     const Dumb = props => (<div />)
     const policy = Policy(props => false)
