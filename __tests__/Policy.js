@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 jest.unmock('../src')
 jest.useRealTimers()
 
@@ -161,7 +162,21 @@ describe('Policy', () => {
   it('should be possible to create policy derivatives', () => {
     const Dumb = props => (<div />)
     const policy = Policy(props => false)
-    const derivative = policy.derivate(props => props.valid)
+    const derivative = policy.derivate({ test: props => props.valid })
+    const PoliciedComponent = derivative(Dumb)
+    const Wrapper = mount(<PoliciedComponent invalid />)
+
+    expect(Wrapper.find(Dumb).length).toBe(0)
+
+    Wrapper.setProps({ valid: true })
+
+    expect(Wrapper.find(Dumb).length).toBe(1)
+  })
+
+  it('should be possible to create policy derivatives using previous config', () => {
+    const Dumb = props => (<div />)
+    const policy = Policy(props => false)
+    const derivative = policy.derivate(config => ({ test: props => props.valid }))
     const PoliciedComponent = derivative(Dumb)
     const Wrapper = mount(<PoliciedComponent invalid />)
 

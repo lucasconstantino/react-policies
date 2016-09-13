@@ -115,7 +115,7 @@ const Policy = (...configs) => {
     return compose(PoliciedComponent)
   }
 
-  HOC.derivate = override => Policy(config, override)
+  HOC.derivate = override => Policy(config, typeof override === 'function' ? override(config) : override)
 
   return HOC
 }
