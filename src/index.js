@@ -57,12 +57,12 @@ const Policy = (...configs) => {
     }
 
     test (props) {
-      const failed = !test(props)
-      const testing = isTesting(props)
+      const failed = !test.call(this, props)
+      const testing = isTesting.call(this, props)
 
       this.setState({ testing, failed })
 
-      if (!testing && failed) failure({ ...this, props })
+      if (!testing && failed) failure.call(this, props)
     }
 
     componentDidMount () {
