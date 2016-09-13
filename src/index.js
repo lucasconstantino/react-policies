@@ -5,21 +5,24 @@ const ignore = () => {}
 
 /**
  * @param {Object} config.
+ * @param {String} config.name A name for this policy. Useful when retrieving policy context inside your components.
  * @param {Function} config.test The testing callback. Should return 'true' if the test
- *                               passed and 'false' otherwise. Can also return a promise.
- *                               Can also throw errors, which will be taken as failure.
+ *                               passed and 'false' otherwise.
  * @param {Function} [config.failure] An optional failure callback.
- * @param {Boolean} [preview=false] If set to 'true' will render the component while
- *                                  the testing process is not finished. Defaults to
- *                                  'false', which means 'placeholder' or 'empty'
- *                                  component will be used instead.
+ * @param {Function} [config.isTesting] An optional callback to determine if the test is in progress.
+ * @param {Boolean} [preview=false] If set to 'true' will render the component while the
+ *                                  testing process is not finished (see "isTesting"
+ *                                  argument). Defaults to 'false', which means
+ *                                  'placeholder' or 'empty' component will be
+ *                                  used instead.
  * @param {Object} [empty=<div />] A component to be rendered when the test fails.
  * @param {Object} [placeholder=null] A component to be redered while the testing process
- *                                    is not finished.
+ *                                    is not finished  (see "isTesting" argument above).
  * @param {Function} [config.shouldUpdate] A callback to determine if policy testing
- *                                         should be re-executed or note. This callback
- *                                         receives two arguments: 'to' and 'from', where
- *                                         'to' equals nextProps and 'from' equals current.
+ *                                         should be re-executed or note. It works much
+ *                                         similarly to "shouldComponentUpdate"; it
+ *                                         receives "nextProps" as an argument and have
+ *                                         current props accessible via "this.props".
  * @return {Function} A policy decorator.
  */
 const Policy = (...configs) => {

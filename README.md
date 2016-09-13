@@ -12,7 +12,7 @@ This module does not intend to do something much different, but instead it provi
 
 `npm install --save react-policies`
 
-## Tutorial
+## Sample
 
 ```js
 import React, { Component, PropTypes } from 'react'
@@ -65,12 +65,14 @@ Here are the basic configurations:
 
 Config key              | Type     | Description
 ------------------------|----------|-----------
-`test`                  | Function | The policy validation function. Should return 'true' if the test passed and 'false' otherwise. Can also return a promise. Can also throw errors, which will be taken as failure.
-`failure`               | Function | An optional failure callback.
-`preview`               | Boolean  | If set to 'true' will render the component while the testing process is not finished. Defaults to 'false', which means 'placeholder' or 'empty' component will be used instead.
-`empty`                 | Object   | A component to be rendered when the test fails.
-`placeholder`           | Object   | A component to be redered while the testing process is not finished.
-`shouldTest`            | Function | A callback to determine if policy testing should be re-executed after properties change. This callback receives two arguments: 'to' and 'from', where 'to' equals nextProps and 'from' equals current.
+`test`                  | Function | The policy validation function. Should return 'true' if the test passes and 'false' otherwise.
+`name`                  | String   | (optional) A name for this policy. Useful when retrieving policy context inside your components.
+`failure`               | Function | (optional) A failure callback.
+`isTesting`             | Function | (optional) A callback to determine if the test is in progress.
+`preview`               | Boolean  | (optional) If set to 'true' will render the component while the testing process is not finished (see "isTesting" argument above). Defaults to 'false', which means 'placeholder' or 'empty' component will be used instead.
+`empty`                 | Object   | (optional) A component to be rendered when the test fails. Defaults to an empty `div`.
+`placeholder`           | Object   | (optional) A component to be rendered while the testing process is not finished (see "isTesting" argument above).
+`shouldUpdate`          | Function | (optional)A callback to determine if policy testing should be re-executed or note. It works much similarly to "shouldComponentUpdate"; it receives "nextProps" as an argument and have current props accessible via "this.props".
 
 > `config` can also be a function, which will be taken for the `test` configuration key.
 
