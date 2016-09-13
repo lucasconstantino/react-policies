@@ -16,10 +16,10 @@ const ignore = () => {}
  * @param {Object} [empty=<div />] A component to be rendered when the test fails.
  * @param {Object} [placeholder=null] A component to be redered while the testing process
  *                                    is not finished.
- * @param {Function} [config.shouldTest] A callback to determine if policy testing
- *                                       should be re-executed or note. This callback
- *                                       receives two arguments: 'to' and 'from', where
- *                                       'to' equals nextProps and 'from' equals current.
+ * @param {Function} [config.shouldUpdate] A callback to determine if policy testing
+ *                                         should be re-executed or note. This callback
+ *                                         receives two arguments: 'to' and 'from', where
+ *                                         'to' equals nextProps and 'from' equals current.
  * @return {Function} A policy decorator.
  */
 const Policy = (...configs) => {
@@ -30,24 +30,15 @@ const Policy = (...configs) => {
   const {
     name,
     test,
-    failure = () => {},
+    failure = ignore,
     preview = false,
     empty = <div />,
     placeholder = null,
-    shouldTest = () => true,
+    shouldUpdate = () => true,
+    isTesting = () => false,
   } = config
 
   const _name = name || (test.name !== 'test' && test.name) || 'policy' + count++
-
-  const _test = props => (async () => test(props))().then(result => {
-    if (!result || result instanceof Error) throw result
-    return result
-  })
-
-  const _shouldTest = (to, from) => (async () => shouldTest(to, from))().then(result => {
-    if (!result || result instanceof Error) throw result
-    return result
-  })
 
   const HOC = Composed => class PoliciedComponent extends Component {
     static displayName = `PoliciedComponent(${_name}/${Composed.displayName || 'Composed'})`
@@ -62,27 +53,26 @@ const Policy = (...configs) => {
 
     constructor (props, foo, bar) {
       super(props)
-      this.state = { tested: false, testing: null, failed: null }
+      this.state = { testing: true, failed: null }
     }
 
-    async test (props) {
-      try {
-        this.setState({ tested: false, testing: true, failed: false })
-        await _test(props)
-        this.setState({ tested: true, testing: false, failed: false })
-      } catch (error) {
-        this.setState({ tested: true, testing: false, failed: true })
-        failure({ ...this, props, error })
-        throw error
-      }
+    test (props) {
+      const failed = !test(props)
+      const testing = isTesting(props)
+
+      this.setState({ testing, failed })
+
+      if (!testing && failed) failure({ ...this, props })
     }
 
     componentDidMount () {
-      this.test(this.props).catch(ignore)
+      this.test(this.props)
     }
 
     componentWillReceiveProps (nextProps) {
-      _shouldTest(nextProps, this.props).then(() => this.test(nextProps)).catch(ignore)
+      if (shouldUpdate.call(this, nextProps)) {
+        this.test(nextProps)
+      }
     }
 
     getChildContext () {
@@ -95,17 +85,17 @@ const Policy = (...configs) => {
     }
 
     render () {
-      const { tested, testing, failed } = this.state
+      const { testing, failed } = this.state
 
       // 1. In case still testing, not failed, and allowing preview.
-      if (testing && !failed && preview) return <Composed { ...this.props } />
+      if (testing && preview) return <Composed { ...this.props } />
 
       // 2. In case still testing and placeholder component available,
       // show placeholder component.
-      if (!tested && !failed && placeholder) return placeholder
+      if (testing && placeholder) return placeholder
 
       // 3. In case finished testing and not failed, render component.
-      if (tested && !failed) return <Composed { ...this.props } />
+      if (!failed) return <Composed { ...this.props } />
 
       // 4. In case finished testing or failed or not previewing,
       // return empty component or null if none given.
