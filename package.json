@@ -1,6 +1,6 @@
 {
   "name": "react-policies",
-  "version": "0.3.0",
+  "version": "0.3.2",
   "description": "A policy based access control for React components.",
   "main": "lib/index.js",
   "files": [

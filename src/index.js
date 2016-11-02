@@ -74,7 +74,7 @@ const Policy = (...configs) => {
         if (!testing && failed) failure.call(this, props)
       }
 
-      componentDidMount () {
+      componentWillMount () {
         this.test(this.props)
       }
 
