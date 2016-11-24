@@ -77,6 +77,56 @@ Config key              | Type     | Description
 
 > `config` can also be a function, which will be taken for the `test` configuration key.
 
+## Advanced sample, using [react-router](https://github.com/ReactTraining/react-router) and [redux](https://github.com/reactjs/redux)
+
+`/policies/authenticated.js`
+```js
+import Policy from 'react-policies'
+import { connect } from 'react-redux'
+
+const mapStateToProps = ({ user }) => ({ user })
+
+const authenticated = Policy({
+  name: 'authenticated',
+  test: ({ user }) => !!user,
+  compose: PoliciedComponent => connect(mapStateToProps)(PoliciedComponent)
+})
+
+export default authenticated
+```
+
+On this file we define a reusable generic policy to prevent component access based on the existence of a non-falsy user in the state. The policy uses `compose` option to connect the state to the policy itself - no need for the component that uses this policy to provide the user for checking.
+
+`/policies/enforceLogin.js`
+```js
+import { withRouter } from 'react-router'
+import { connect } from 'react-redux'
+
+import authenticated from './authenticated'
+
+const mapStateToProps = ({ loadingUser }) => ({ loadingUser })
+
+const onFailure = ({ router }) => router.push('/user/login')
+
+const enforceLogin = authenticated.derivate(({ compose }) => ({
+  name: 'enforceLogin',
+  failure: onFailure,
+  isTesting: ({ loadingUser }) => loadingUser,
+  preview: false,
+  compose: PoliciedComponent => compose(withRouter(connect(mapStateToProps)(PoliciedComponent)))
+}))
+
+export default enforceLogin
+```
+
+This specialized policy is derivative from the previous one. It uses the `derivate` method of the previous policy to create a new policy which will redirect the user to the `/user/login` path when the policy results false.
+
+This policy also verifies if the state has a `loadingUser` flag set to true - this would mean the user information is still loading and the user might actually be already logged in, so the policy won't redirect - nor show it's underlying component - until this flag is changed to false.
+
+The `compose` option is quite robust here: what it does is wrap the `PoliciedComponent` in the `withRouter` higher order component, which will make the router available as property, and does a second `connect` to bring data from the redux state.
+
+From here on, you can use the `enforceLogin` policy on the components served as routes from the `react-router`, and use the `authenticated` policy when you want to hide a component from view but do nothing extra - such as when hidding a `logout` button in the header of the page.
+
 ## License
 
 Copyright (c) 2016 Lucas Constantino Silva
