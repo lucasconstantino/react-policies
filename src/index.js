@@ -60,7 +60,7 @@ const Policy = (...configs) => {
         policy: PropTypes.object,
       }
 
-      constructor (props, foo, bar) {
+      constructor (props) {
         super(props)
         this.state = { testing: true, failed: null }
       }
