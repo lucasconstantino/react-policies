@@ -2,9 +2,13 @@ jest.unmock('../src')
 jest.useRealTimers()
 
 import React from 'react'
-import { mount } from 'enzyme'
+import PropTypes from 'prop-types'
+import Enzyme, { mount } from 'enzyme'
+import Adapter from 'enzyme-adapter-react-16'
 
 import Policy, { combine as policies } from '../src'
+
+Enzyme.configure({ adapter: new Adapter() })
 
 describe('Combine', () => {
   it('should show component if combined policy validates true', () => {
@@ -39,7 +43,7 @@ describe('Combine', () => {
   it('should have combined policy contexts available to components', () => {
     class Dumb extends React.Component {
       static contextTypes = {
-        policy: React.PropTypes.object,
+        policy: PropTypes.object,
       }
 
       render () {
