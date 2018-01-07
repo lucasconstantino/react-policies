@@ -35,7 +35,7 @@
     "babel-preset-react": "^6.3.13",
     "babel-preset-stage-0": "^6.3.13",
     "babel-runtime": "^6.9.2",
-    "enzyme": "^2.4.1",
+    "enzyme": "^3.3.0",
     "eslint": "^3.0.1",
     "eslint-config-rackt": "^1.1.1",
     "eslint-config-standard": "^5.3.5",
@@ -45,12 +45,14 @@
     "eslint-plugin-react": "^5.2.2",
     "eslint-plugin-standard": "^2.0.0",
     "jest": "^13.2.3",
-    "react": "^15.3.1",
-    "react-addons-test-utils": "^15.2.1",
-    "react-dom": "^15.2.1"
+    "prop-types": "^15.6.0",
+    "react": "^16.1.0",
+    "react-addons-test-utils": "^15.6.2",
+    "react-dom": "^16.1.0"
   },
   "peerDependencies": {
-    "react": "^15.3.1"
+    "react": "^16.1.0",
+    "prop-types": "^15.6.0"
   },
   "jest": {
     "scriptPreprocessor": "<rootDir>/node_modules/babel-jest",
@@ -74,5 +76,8 @@
   "bugs": {
     "url": "https://github.com/lucasconstantino/react-policies/issues"
   },
-  "homepage": "https://github.com/lucasconstantino/react-policies#readme"
+  "homepage": "https://github.com/lucasconstantino/react-policies#readme",
+  "dependencies": {
+    "enzyme-adapter-react-16": "^1.1.1"
+  }
 }

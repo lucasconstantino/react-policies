@@ -3,9 +3,12 @@ jest.unmock('../src')
 jest.useRealTimers()
 
 import React from 'react'
-import { mount } from 'enzyme'
-
+import PropTypes from 'prop-types'
+import Enzyme, { mount } from 'enzyme'
+import Adapter from 'enzyme-adapter-react-16'
 import Policy from '../src'
+
+Enzyme.configure({ adapter: new Adapter() })
 
 describe('Policy', () => {
   it('should show component if policy validates true', () => {
@@ -206,7 +209,7 @@ describe('Policy', () => {
   it('should have policy context available to components', () => {
     class Dumb extends React.Component {
       static contextTypes = {
-        policy: React.PropTypes.object,
+        policy: PropTypes.object,
       }
 
       render () {

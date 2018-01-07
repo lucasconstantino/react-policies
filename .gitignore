@@ -1,4 +1,3 @@
-lib
 examples/**/bundle.js
 node_modules
 coverage
