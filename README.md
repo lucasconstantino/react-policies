@@ -1,4 +1,4 @@
-# React Policies [![Build Status](https://travis-ci.org/lucasconstantino/react-policies.svg?branch=master)](https://travis-ci.org/lucasconstantino/react-policies)
+# React Policies [![Build Status](https://travis-ci.org/lucasconstantino/react-policies.svg?branch=master)](https://travis-ci.org/lucasconstantino/react-policies) [![Greenkeeper badge](https://badges.greenkeeper.io/lucasconstantino/react-policies.svg)](https://greenkeeper.io/)
 
 > Decoupled policy system for React components
 
